@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DamageController;
+use App\Http\Controllers\RuleController;
+use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,9 +28,20 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
+    // Routes
+    Route::apiResource('damages', DamageController::class)->only(['index']);
+    Route::apiResource('symptoms', SymptomController::class)->only(['index']);
+    Route::apiResource('rules', RuleController::class)->only(['index']);
+
+    Route::middleware('role:admin,staff')->group(function () {
+        Route::apiResource('damages', DamageController::class)->except(['index']);
+        Route::apiResource('symptoms', SymptomController::class)->except(['index']);
+    });
+
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
+        Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
     });
 
     // Staff Routes

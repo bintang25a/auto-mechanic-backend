@@ -99,7 +99,7 @@ class UserController extends Controller
 
     public function update(string $uid, Request $request)
     {
-        $user = User::query()->findOrFail($uid);
+        $user = User::query()->find($uid);
 
         if (! $user) {
             return response()->json([

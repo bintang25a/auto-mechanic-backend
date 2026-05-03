@@ -1,0 +1,18 @@
+INSERT INTO damages (damage_code, name, created_at, updated_at) VALUES
+('K1', 'Piston', NOW(), NOW()),
+('K2', 'CDI', NOW(), NOW()),
+('K3', 'Klep', NOW(), NOW()),
+('K4', 'Rem', NOW(), NOW()),
+('K5', 'Electric Starter', NOW(), NOW()),
+('K6', 'Pompa Oli', NOW(), NOW()),
+('K7', 'Alternator', NOW(), NOW()),
+('K8', 'Crankshaft', NOW(), NOW()),
+('K9', 'Koil', NOW(), NOW()),
+('K10', 'Karburator', NOW(), NOW()),
+('K11', 'Busi', NOW(), NOW()),
+('K12', 'Filter Udara', NOW(), NOW()),
+('K13', 'Spull', NOW(), NOW()),
+('K14', 'Kampas Kopling', NOW(), NOW()),
+('K15', 'V Belt', NOW(), NOW()),
+('K16', 'Roller', NOW(), NOW()),
+('K17', 'House Kopling', NOW(), NOW());
