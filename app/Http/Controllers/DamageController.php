@@ -8,14 +8,26 @@ use Illuminate\Support\Facades\Validator;
 
 class DamageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $damages = Damage::all();
+        $query = Damage::query();
+
+        $filters = $request->except('page');
+
+        foreach ($filters as $column => $value) {
+            if (! empty($value)) {
+                $query->where($column, 'LIKE', '%'.$value.'%');
+            }
+        }
+
+        $damages = $query->paginate(20);
 
         return response()->json([
             'success' => true,
             'message' => 'Get all damages',
-            'data' => $damages,
+            'total' => $damages->total(),
+            'current_page' => $damages->currentPage(),
+            'data' => $damages->items(),
         ], 200);
     }
 
@@ -76,7 +88,7 @@ class DamageController extends Controller
     {
         $damage = Damage::query()->find($damage_code);
 
-        if (!$damage) {
+        if (! $damage) {
             return response()->json([
                 'success' => false,
                 'message' => 'Damage update failed, not found',
@@ -120,7 +132,7 @@ class DamageController extends Controller
     {
         $damage = Damage::query()->find($damage_code);
 
-        if (!$damage) {
+        if (! $damage) {
             return response()->json([
                 'success' => false,
                 'message' => 'Damage delete failed, not found',

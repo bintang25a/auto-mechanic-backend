@@ -10,15 +10,26 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        // $users = User::with('queue', 'complaint')->get();
+        $query = User::query();
+
+        $filters = $request->except('page');
+
+        foreach ($filters as $column => $value) {
+            if (! empty($value)) {
+                $query->where($column, 'LIKE', '%'.$value.'%');
+            }
+        }
+
+        $users = $query->paginate(20);
 
         return response()->json([
             'success' => true,
             'message' => 'Get all users',
-            'data' => $users,
+            'total' => $users->total(),
+            'current_page' => $users->currentPage(),
+            'data' => $users->items(),
         ], 200);
     }
 
@@ -55,7 +66,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => implode(', ', $validator->errors()->all())
+                'message' => implode(', ', $validator->errors()->all()),
             ], 422);
         }
 
@@ -109,9 +120,9 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'uid' => 'required|string|max:64|unique:users,uid,' . $user->uid. ',uid',
+            'uid' => 'required|string|max:64|unique:users,uid,'.$user->uid.',uid',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->uid. ',uid',
+            'email' => 'required|email|unique:users,email,'.$user->uid.',uid',
             'phone_number' => 'required|numeric',
             'role' => 'required|in:admin,staff,customer',
             'password' => 'string|min:8',
@@ -121,7 +132,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => implode(', ', $validator->errors()->all())
+                'message' => implode(', ', $validator->errors()->all()),
             ], 422);
         }
 
@@ -178,7 +189,7 @@ class UserController extends Controller
         if ($user && $user->role === 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Delete failed, admin'
+                'message' => 'Delete failed, admin',
             ], 403);
         }
 
@@ -195,12 +206,12 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'User delete successfully'
+                'message' => 'User delete successfully',
             ], 200);
         } else {
             return response()->json([
                 'succes' => false,
-                'message' => 'User delete failed, not found'
+                'message' => 'User delete failed, not found',
             ], 404);
         }
     }

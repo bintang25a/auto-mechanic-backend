@@ -8,14 +8,26 @@ use Illuminate\Support\Facades\Validator;
 
 class SymptomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $symptoms = Symptom::all();
+        $query = Symptom::query();
+
+        $filters = $request->except('page');
+
+        foreach ($filters as $column => $value) {
+            if (! empty($value)) {
+                $query->where($column, 'LIKE', '%'.$value.'%');
+            }
+        }
+
+        $symptoms = $query->paginate(20);
 
         return response()->json([
             'success' => true,
             'message' => 'Get all symptoms',
-            'data' => $symptoms,
+            'total' => $symptoms->total(),
+            'current_page' => $symptoms->currentPage(),
+            'data' => $symptoms->items(),
         ], 200);
     }
 
@@ -76,7 +88,7 @@ class SymptomController extends Controller
     {
         $symptom = Symptom::query()->find($symptom_code);
 
-        if (!$symptom) {
+        if (! $symptom) {
             return response()->json([
                 'success' => false,
                 'message' => 'Symptom update failed, not found',
@@ -120,7 +132,7 @@ class SymptomController extends Controller
     {
         $symptom = Symptom::query()->find($symptom_code);
 
-        if (!$symptom) {
+        if (! $symptom) {
             return response()->json([
                 'success' => false,
                 'message' => 'Symptom delete failed, not found',

@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->admin()->create();
 
-        User::factory(5)->create();
+        User::factory(40)->create();
 
-        User::factory(3)->unverified()->create();
+        User::factory(8)->unverified()->create();
 
         $this->call([
             SymptomSeeder::class,
