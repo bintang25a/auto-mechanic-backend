@@ -34,18 +34,19 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('rules', RuleController::class)->only(['index']);
 
     Route::middleware('role:admin,staff')->group(function () {
+        Route::apiResource('users', UserController::class)->only(['show']);
         Route::apiResource('damages', DamageController::class)->except(['index']);
         Route::apiResource('symptoms', SymptomController::class)->except(['index']);
     });
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('users', UserController::class);
+        Route::apiResource('users', UserController::class)->except(['show']);
         Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
     });
 
     // Staff Routes
     Route::middleware('role:staff')->group(function () {
-        Route::apiResource('users', UserController::class)->only(['show']);
+        // Route::apiResource('users', UserController::class)->only(['show']);
     });
 });

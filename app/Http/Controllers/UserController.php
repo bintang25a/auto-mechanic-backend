@@ -78,8 +78,7 @@ class UserController extends Controller
 
                 $fileName = $request->uid.'_'.time().'.'.$file->getClientOriginalExtension();
 
-                $path = $file->storeAs('uploads/users', $fileName, 'public');
-                $photoPath = url('storage/'.$path);
+                $photoPath = $file->storeAs('uploads/users', $fileName, 'public');
             }
 
             $user = User::create([
@@ -150,8 +149,7 @@ class UserController extends Controller
 
                 $file = $request->file('photo');
                 $fileName = $request->uid.'_'.time().'.'.$file->getClientOriginalExtension();
-                $path = $file->storeAs('uploads/users', $fileName, 'public');
-                $photoPath = url('storage/'.$path);
+                $photoPath = $file->storeAs('uploads/users', $fileName, 'public');
             }
 
             $data = [
