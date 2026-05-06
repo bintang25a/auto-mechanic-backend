@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DamageController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\UserController;
@@ -41,6 +42,7 @@ Route::middleware('auth:api')->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
+        Route::get('/admin-page-rules', [PageController::class, 'adminPageRules']);
         Route::apiResource('users', UserController::class)->except(['show']);
         Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
     });

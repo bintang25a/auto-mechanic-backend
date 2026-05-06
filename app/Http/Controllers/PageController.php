@@ -2,63 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Damage;
+use App\Models\Rule;
+use App\Models\Symptom;
 
 class PageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function adminPageRules()
     {
-        //
-    }
+        $rules = Rule::all();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $symptoms = Symptom::query()
+            ->select(['symptom_code', 'name'])
+            ->get()
+            ->toArray();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $damages = Damage::query()
+            ->select(['damage_code', 'name'])
+            ->get()
+            ->toArray();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'message' => 'Get all rules',
+            'symptoms' => $symptoms,
+            'damages' => $damages,
+            'rules' => $rules,
+        ], 200);
     }
 }
