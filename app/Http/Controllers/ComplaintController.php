@@ -110,7 +110,7 @@ class ComplaintController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Complaint created successfully',
-                'data' => ComplaintResource::collection($complaints),
+                'data' => ComplaintResource::collection($complaint),
             ], 201);
         } catch (\Exception $e) {
 
