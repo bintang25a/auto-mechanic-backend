@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ComplaintResource;
 use App\Models\Complaint;
 use App\Models\Queue;
 use App\Models\Rule;
@@ -16,13 +17,13 @@ class ComplaintController extends Controller
         $complaints = Complaint::with([
             'customer',
             'queue',
-            'symptoms'
+            'symptoms',
         ])->latest()->get();
 
         return response()->json([
             'success' => true,
-            'message' => "Get all complaints",
-            'data' => $complaints
+            'message' => 'Get all complaints',
+            'data' => $complaints,
         ], 200);
     }
 
@@ -31,20 +32,20 @@ class ComplaintController extends Controller
         $complaint = Complaint::with([
             'customer',
             'queue',
-            'symptoms'
+            'symptoms',
         ])->find($id);
 
-        if (!$complaint) {
+        if (! $complaint) {
             return response()->json([
                 'success' => false,
-                'message' => 'Complaint not found'
+                'message' => 'Complaint not found',
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'message' => "Get complaint",
-            'data' => $complaint
+            'message' => 'Show complaint'.$id,
+            'data' => new ComplaintResource($complaint),
         ]);
     }
 
@@ -83,7 +84,7 @@ class ComplaintController extends Controller
 
             foreach ($rules as $rule) {
 
-                if (!isset($damageScores[$rule->damage_code])) {
+                if (! isset($damageScores[$rule->damage_code])) {
                     $damageScores[$rule->damage_code] = 0;
                 }
 
@@ -109,11 +110,7 @@ class ComplaintController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Complaint created successfully',
-                'data' => [
-                    'complaint' => $complaint->load('symptoms'),
-                    'diagnosis' => $diagnosis,
-                    'scores' => $damageScores
-                ]
+                'data' => ComplaintResource::collection($complaints),
             ], 201);
         } catch (\Exception $e) {
 
@@ -121,7 +118,7 @@ class ComplaintController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Complaint creation failed'.$e->getMessage(),
             ], 500);
         }
     }
@@ -130,10 +127,10 @@ class ComplaintController extends Controller
     {
         $complaint = Complaint::find($id);
 
-        if (!$complaint) {
+        if (! $complaint) {
             return response()->json([
                 'success' => false,
-                'message' => 'Complaint not found'
+                'message' => 'Complaint delete failed, not found',
             ], 404);
         }
 
@@ -141,7 +138,7 @@ class ComplaintController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Complaint deleted successfully'
+            'message' => 'Complaint delete successfully',
         ]);
     }
 }

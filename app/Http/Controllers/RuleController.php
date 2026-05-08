@@ -72,7 +72,7 @@ class RuleController extends Controller
         if (! $rule) {
             return response()->json([
                 'success' => false,
-                'message' => 'rule delete failed, not found',
+                'message' => 'Rule delete failed, not found',
             ], 404);
         }
 
@@ -81,12 +81,12 @@ class RuleController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Rules delete successfully',
+                'message' => 'Rule delete successfully',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Rules delete failed: '.$e->getMessage(),
+                'message' => 'Rule delete failed: '.$e->getMessage(),
             ], 500);
         }
     }
