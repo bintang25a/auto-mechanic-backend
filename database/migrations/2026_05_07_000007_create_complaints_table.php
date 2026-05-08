@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreign('customer_id')->references('uid')->on('users')->onDelete('cascade');
             $table->string('queue_id');
             $table->foreign('queue_id')->references('id')->on('queues')->onDelete('cascade');
+            $table->string('vehicle');
+            $table->string('license_number');
             $table->text('description');
             $table->timestamps();
         });

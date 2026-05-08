@@ -53,6 +53,8 @@ class ComplaintController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'customer_id' => 'required|exists:users,uid',
+            'vehicle' => 'required|string',
+            'license_number' => 'required|string',
             'description' => 'required|string',
             'symptoms' => 'required|array|min:1',
             'symptoms.*' => 'exists:symptoms,symptom_code',
@@ -110,7 +112,7 @@ class ComplaintController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Complaint created successfully',
-                'data' => ComplaintResource::collection($complaint),
+                'data' => new ComplaintResource($complaint),
             ], 201);
         } catch (\Exception $e) {
 
@@ -125,7 +127,7 @@ class ComplaintController extends Controller
 
     public function destroy(string $id)
     {
-        $complaint = Complaint::find($id);
+        $complaint = Complaint::query()->find($id);
 
         if (! $complaint) {
             return response()->json([

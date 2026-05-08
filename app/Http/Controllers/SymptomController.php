@@ -12,7 +12,7 @@ class SymptomController extends Controller
     {
         $query = Symptom::query();
 
-        $filters = $request->except('page');
+        $filters = $request->except(['page', 'per_page']);
 
         foreach ($filters as $column => $value) {
             if (! empty($value)) {
@@ -20,15 +20,26 @@ class SymptomController extends Controller
             }
         }
 
-        $symptoms = $query->paginate(20);
+        if ($request->has('per_page')) {
+            $symptoms = $query->paginate($request->per_page);
 
-        return response()->json([
+            $responseData = [
+                'total' => $symptoms->total(),
+                'current_page' => $symptoms->currentPage(),
+                'data' => $symptoms->items(),
+            ];
+        } else {
+            $symptoms = $query->get();
+
+            $responseData = [
+                'data' => $symptoms,
+            ];
+        }
+
+        return response()->json(array_merge([
             'success' => true,
-            'message' => 'Get all symptoms',
-            'total' => $symptoms->total(),
-            'current_page' => $symptoms->currentPage(),
-            'data' => $symptoms->items(),
-        ], 200);
+            'message' => 'Get symptoms',
+        ], $responseData), 200);
     }
 
     public function show(string $symptom_code)

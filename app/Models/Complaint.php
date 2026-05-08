@@ -20,6 +20,8 @@ class Complaint extends Model
     protected $fillable = [
         'complaint_number',
         'customer_id',
+        'vehicle',
+        'license_number',
         'queue_id',
         'description',
     ];
@@ -32,14 +34,14 @@ class Complaint extends Model
 
             $lastComplaint = self::orderBy('complaint_number', 'desc')->first();
 
-            if (!$lastComplaint) {
+            if (! $lastComplaint) {
                 $number = 1;
             } else {
                 $lastNumber = (int) substr($lastComplaint->complaint_number, 3);
                 $number = $lastNumber + 1;
             }
 
-            $complaint->complaint_number = 'CMP' . str_pad($number, 5, '0', STR_PAD_LEFT);
+            $complaint->complaint_number = 'CMP'.str_pad($number, 5, '0', STR_PAD_LEFT);
         });
     }
 
