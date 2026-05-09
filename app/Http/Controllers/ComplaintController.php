@@ -12,39 +12,65 @@ use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $complaints = Complaint::with([
             'customer',
             'queue',
             'symptoms',
-        ])->latest()->get();
+        ])
+            ->when($request->query('customer_id'), function ($query, $customerId) {
+                return $query->where('customer_id', $customerId);
+            })
+            ->latest()
+            ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Get all complaints',
+            'message' => 'Get complaints data',
             'data' => $complaints,
         ], 200);
     }
 
     public function show(string $id)
     {
-        $complaint = Complaint::with([
-            'customer',
-            'queue',
-            'symptoms',
-        ])->find($id);
+        $complaint = Complaint::with(['customer', 'queue', 'symptoms'])->find($id);
 
         if (! $complaint) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Complaint not found',
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'Not found'], 404);
         }
+
+        $symptomCodes = $complaint->symptoms->pluck('symptom_code')->toArray();
+        $rules = Rule::with('damage')->whereIn('symptom_code', $symptomCodes)->get();
+
+        $damageScores = [];
+        $totalMatches = 0;
+
+        foreach ($rules as $rule) {
+            $code = $rule->damage_code;
+            if (! isset($damageScores[$code])) {
+                $damageScores[$code] = [
+                    'name' => $rule->damage->name ?? 'Unknown',
+                    'count' => 0,
+                ];
+            }
+            $damageScores[$code]['count']++;
+            $totalMatches++;
+        }
+
+        $diagnoses = collect($damageScores)->map(function ($item) use ($totalMatches) {
+            return [
+                'damage_name' => $item['name'],
+                'score' => $item['count'],
+                'rate' => $totalMatches > 0 ? round(($item['count'] / $totalMatches) * 100, 2).'%' : '0%',
+            ];
+        })->sortByDesc('score')->values()->all();
+
+        $complaint->all_diagnoses = $diagnoses;
 
         return response()->json([
             'success' => true,
-            'message' => 'Show complaint'.$id,
+            'message' => 'Diagnosis complete',
             'data' => new ComplaintResource($complaint),
         ]);
     }
@@ -80,7 +106,7 @@ class ComplaintController extends Controller
 
             $complaint->symptoms()->attach($request->symptoms);
 
-            $rules = Rule::whereIn('symptom_code', $request->symptoms)->get();
+            $rules = Rule::query()->whereIn('symptom_code', $request->symptoms)->get();
 
             $damageScores = [];
 
@@ -136,6 +162,7 @@ class ComplaintController extends Controller
             ], 404);
         }
 
+        /** @var Complaint $complaint */
         $complaint->delete();
 
         return response()->json([
