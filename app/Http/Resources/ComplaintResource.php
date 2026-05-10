@@ -29,13 +29,14 @@ class ComplaintResource extends JsonResource
             'customer' => [
                 'id' => $this->customer?->uid,
                 'name' => $this->customer?->name,
+                'phone_number' => $this->customer?->phone_number,
             ],
 
             'queue' => new QueueResource($this->whenLoaded('queue')),
 
             'symptoms' => SymptomResource::collection($this->whenLoaded('symptoms')),
 
-            'diagnosis' => $this->diagnosis,
+            'diagnosis' => $this->all_diagnoses,
         ];
     }
 }

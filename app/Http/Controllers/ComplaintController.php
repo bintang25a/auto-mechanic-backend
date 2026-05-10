@@ -40,31 +40,29 @@ class ComplaintController extends Controller
             return response()->json(['success' => false, 'message' => 'Not found'], 404);
         }
 
-        $symptomCodes = $complaint->symptoms->pluck('symptom_code')->toArray();
-        $rules = Rule::with('damage')->whereIn('symptom_code', $symptomCodes)->get();
+        $userSymptomCodes = $complaint->symptoms->pluck('symptom_code')->toArray();
 
-        $damageScores = [];
-        $totalMatches = 0;
+        $allRules = Rule::with('damage')->get()->groupBy('damage_code');
 
-        foreach ($rules as $rule) {
-            $code = $rule->damage_code;
-            if (! isset($damageScores[$code])) {
-                $damageScores[$code] = [
-                    'name' => $rule->damage->name ?? 'Unknown',
-                    'count' => 0,
+        $diagnoses = [];
+
+        foreach ($allRules as $damageCode => $rulesInDamage) {
+            $totalSymptomsInRule = $rulesInDamage->count();
+
+            $matchedSymptoms = $rulesInDamage->whereIn('symptom_code', $userSymptomCodes)->count();
+
+            if ($matchedSymptoms > 0) {
+                $diagnoses[] = [
+                    'code' => $damageCode,
+                    'name' => $rulesInDamage->first()->damage->name ?? 'Unknown',
+                    'rate' => round(($matchedSymptoms / $totalSymptomsInRule) * 100, 2).'%',
                 ];
             }
-            $damageScores[$code]['count']++;
-            $totalMatches++;
         }
 
-        $diagnoses = collect($damageScores)->map(function ($item) use ($totalMatches) {
-            return [
-                'damage_name' => $item['name'],
-                'score' => $item['count'],
-                'rate' => $totalMatches > 0 ? round(($item['count'] / $totalMatches) * 100, 2) . '%' : '0%',
-            ];
-        })->sortByDesc('score')->values()->all();
+        $diagnoses = collect($diagnoses)->sortByDesc(function ($item) {
+            return (float) $item['rate'];
+        })->values()->all();
 
         $complaint->all_diagnoses = $diagnoses;
 
@@ -148,7 +146,7 @@ class ComplaintController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Complaint creation failed' . $e->getMessage(),
+                'message' => 'Complaint creation failed'.$e->getMessage(),
             ], 500);
         }
     }
