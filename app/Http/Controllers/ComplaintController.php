@@ -62,7 +62,7 @@ class ComplaintController extends Controller
             return [
                 'damage_name' => $item['name'],
                 'score' => $item['count'],
-                'rate' => $totalMatches > 0 ? round(($item['count'] / $totalMatches) * 100, 2).'%' : '0%',
+                'rate' => $totalMatches > 0 ? round(($item['count'] / $totalMatches) * 100, 2) . '%' : '0%',
             ];
         })->sortByDesc('score')->values()->all();
 
@@ -101,6 +101,8 @@ class ComplaintController extends Controller
             $complaint = Complaint::create([
                 'customer_id' => $request->customer_id,
                 'queue_id' => $queue->id,
+                'vehicle' => $request->vehicle,
+                'license_number' => $request->license_number,
                 'description' => $request->description,
             ]);
 
@@ -146,7 +148,7 @@ class ComplaintController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Complaint creation failed'.$e->getMessage(),
+                'message' => 'Complaint creation failed' . $e->getMessage(),
             ], 500);
         }
     }

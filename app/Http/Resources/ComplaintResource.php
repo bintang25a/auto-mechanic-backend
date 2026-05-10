@@ -20,6 +20,10 @@ class ComplaintResource extends JsonResource
 
             'description' => $this->description,
 
+            'vehicle' => $this->vehicle,
+
+            'license_number' => $this->license_number,
+
             'created_at' => $this->created_at,
 
             'customer' => [
