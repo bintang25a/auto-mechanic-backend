@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DamageController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\SymptomController;
 use App\Http\Controllers\UserController;
@@ -24,11 +25,14 @@ Route::post('/email/resend', [AuthController::class, 'resendVerifyEmail'])->midd
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register']);
 
+// Queue Routes
+
 // Basic Routes
 Route::middleware('auth:api')->group(function () {
     // Auth Routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/queues', [QueueController::class, 'index']);
 
     // Routes
     Route::apiResource('damages', DamageController::class)->only(['index']);
