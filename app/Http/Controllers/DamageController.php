@@ -12,7 +12,7 @@ class DamageController extends Controller
     {
         $query = Damage::query();
 
-        $filters = $request->except('page');
+        $filters = $request->except(['page', 'per_page']);
 
         foreach ($filters as $column => $value) {
             if (! empty($value)) {
@@ -20,15 +20,26 @@ class DamageController extends Controller
             }
         }
 
-        $damages = $query->paginate(20);
+        if ($request->has('per_page')) {
+            $damages = $query->paginate($request->per_page);
 
-        return response()->json([
+            $responseData = [
+                'total' => $damages->total(),
+                'current_page' => $damages->currentPage(),
+                'data' => $damages->items(),
+            ];
+        } else {
+            $damages = $query->get();
+
+            $responseData = [
+                'data' => $damages,
+            ];
+        }
+
+        return response()->json(array_merge([
             'success' => true,
-            'message' => 'Get all damages',
-            'total' => $damages->total(),
-            'current_page' => $damages->currentPage(),
-            'data' => $damages->items(),
-        ], 200);
+            'message' => 'Get all symptoms',
+        ], $responseData), 200);
     }
 
     public function show(string $damage_code)

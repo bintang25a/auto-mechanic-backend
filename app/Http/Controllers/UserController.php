@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -35,13 +36,13 @@ class UserController extends Controller
 
     public function show(string $uid)
     {
-        $user = User::query()->find($uid);
+        $user = User::query()->with('complaints.queue')->find($uid);
 
         if ($user) {
             return response()->json([
                 'success' => true,
                 'message' => 'Show user id '.$uid,
-                'data' => $user,
+                'data' => new UserResource($user),
             ], 200);
         } else {
             return response()->json([

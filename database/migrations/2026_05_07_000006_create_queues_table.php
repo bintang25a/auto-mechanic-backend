@@ -17,11 +17,14 @@ return new class extends Migration
 
             $table->string('queue_number')->unique();
 
+            $table->string('mechanic_id');
+            $table->foreign('mechanic_id')->references('uid')->on('users')->onDelete('cascade');
+
             $table->enum('status', [
                 'waiting',
                 'process',
                 'done',
-                'cancel'
+                'cancel',
             ])->default('waiting');
 
             $table->timestamps();

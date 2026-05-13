@@ -38,7 +38,7 @@ class SymptomController extends Controller
 
         return response()->json(array_merge([
             'success' => true,
-            'message' => 'Get symptoms',
+            'message' => 'Get all symptoms',
         ], $responseData), 200);
     }
 

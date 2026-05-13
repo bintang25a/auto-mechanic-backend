@@ -4,8 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,7 +14,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject, MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, MustVerifyEmail;
+    use HasFactory, MustVerifyEmail, Notifiable;
 
     protected $primaryKey = 'uid';
 
@@ -74,4 +74,26 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmailContrac
     {
         return [];
     }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'customer_id', 'uid');
+    }
+
+    public function queues()
+    {
+        return $this->hasManyThrough(
+            Queue::class,
+            Complaint::class,
+            'customer_id',
+            'complaint_number',
+            'uid',
+            'complaint_number'
+        );
+    }
+
+    // public function handledComplaints()
+    // {
+    //     return $this->hasMany(Queue::class, 'mechanic_id', 'uid');
+    // }
 }
