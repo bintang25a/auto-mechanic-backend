@@ -48,6 +48,35 @@ class UserFactory extends Factory
             'photo' => null,
             'email_verified_at' => now(),
         ]);
+
+    }
+
+    public function staff(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'uid' => 'alfizar25b',
+            'name' => 'Bintang Al Fizar',
+            'email' => 'alfizarbintang25@gmail.com',
+            'phone_number' => '082111710709',
+            'role' => 'staff',
+            'password' => Hash::make('staff123'),
+            'photo' => null,
+            'email_verified_at' => now(),
+        ]);
+    }
+
+    public function mechanic(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'uid' => 'bintang37a',
+            'name' => 'Bintang Al Fizar',
+            'email' => 'bintangalfizar37@gmail.com',
+            'phone_number' => '082111710709',
+            'role' => 'mechanic',
+            'password' => Hash::make('mechanic123'),
+            'photo' => null,
+            'email_verified_at' => now(),
+        ]);
     }
 
     /**
