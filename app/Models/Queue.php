@@ -21,6 +21,7 @@ class Queue extends Model
         'id',
         'queue_number',
         'status',
+        'mechanic_id',
     ];
 
     protected static function boot()
@@ -40,7 +41,7 @@ class Queue extends Model
 
             $queue->id = 'Q-'.str_pad($number, 5, '0', STR_PAD_LEFT);
 
-            $todayCount = self::whereDate('created_at', now()->toDateString())
+            $todayCount = self::whereDate('created_at', '=', now()->toDateString(), 'and')
                 ->count();
 
             $queue->queue_number =

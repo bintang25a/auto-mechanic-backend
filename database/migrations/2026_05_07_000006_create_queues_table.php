@@ -17,7 +17,7 @@ return new class extends Migration
 
             $table->string('queue_number')->unique();
 
-            $table->string('mechanic_id');
+            $table->string('mechanic_id')->nullable();
             $table->foreign('mechanic_id')->references('uid')->on('users')->onDelete('cascade');
 
             $table->enum('status', [
