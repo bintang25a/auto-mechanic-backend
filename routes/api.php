@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/queues', [QueueController::class, 'index']);
+    Route::get('/queues/current', [QueueController::class, 'current']);
 
     // Routes
     Route::apiResource('users', UserController::class)->only(['show']);

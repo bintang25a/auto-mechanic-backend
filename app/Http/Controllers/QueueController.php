@@ -25,12 +25,12 @@ class QueueController extends Controller
 
     public function current()
     {
-        $current = Queue::query()->where('status', 'processing')
+        $current = Queue::query()->where('status', 'process')
             ->orderBy('updated_at', 'desc')
             ->first();
 
         if (! $current) {
-            $current = Queue::query()->where('status', 'pending')
+            $current = Queue::query()->where('status', 'waiting')
                 ->orderBy('created_at', 'asc')
                 ->first();
         }
