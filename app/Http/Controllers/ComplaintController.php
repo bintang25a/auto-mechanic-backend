@@ -34,7 +34,7 @@ class ComplaintController extends Controller
 
     public function show(string $id)
     {
-        $complaint = Complaint::with(['customer', 'queue', 'symptoms'])->find($id);
+        $complaint = Complaint::with(['customer', 'queue.mechanic', 'symptoms'])->find($id);
 
         if (! $complaint) {
             return response()->json(['success' => false, 'message' => 'Not found'], 404);
@@ -122,16 +122,6 @@ class ComplaintController extends Controller
             arsort($damageScores);
 
             $bestDamageCode = array_key_first($damageScores);
-
-            $diagnosis = null;
-
-            if ($bestDamageCode) {
-
-                $diagnosis = Rule::with('damage')
-                    ->where('damage_code', $bestDamageCode)
-                    ->first()
-                    ->damage;
-            }
 
             DB::commit();
 

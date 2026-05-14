@@ -11,14 +11,14 @@ class QueueController extends Controller
     {
         $queues = Queue::query()
             ->with('complaint')
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
-            ->when($request->number, fn ($q) => $q->where('queue_number', $request->number))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->number, fn($q) => $q->where('queue_number', $request->number))
             ->orderBy('created_at', 'asc')
             ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Get all queue,'.$request->status,
+            'message' => 'Get all queue,' . $request->status,
             'data' => $queues,
         ]);
     }
@@ -44,7 +44,7 @@ class QueueController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,done,skipped',
+            'status' => 'required|in:waiting,process,done,cancel',
             'mechanic_id' => 'nullable|string|exists:users,uid',
         ]);
 
@@ -59,6 +59,7 @@ class QueueController extends Controller
 
         $queue->update([
             'status' => $request->status,
+            'mechanic_id' => $request->mechanic_id,
         ]);
 
         return response()->json([

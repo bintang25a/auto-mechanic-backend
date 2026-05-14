@@ -35,6 +35,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/queues', [QueueController::class, 'index']);
 
     // Routes
+    Route::apiResource('users', UserController::class)->only(['show']);
     Route::apiResource('damages', DamageController::class)->only(['index']);
     Route::apiResource('symptoms', SymptomController::class)->only(['index']);
     Route::apiResource('rules', RuleController::class)->only(['index']);
@@ -42,16 +43,17 @@ Route::middleware('auth:api')->group(function () {
 
     // Admin and Staff Routes
     Route::middleware('role:admin,staff')->group(function () {
-        Route::apiResource('users', UserController::class)->only(['show']);
+        Route::apiResource('users', UserController::class)->only(['index',]);
         Route::apiResource('damages', DamageController::class)->except(['index']);
         Route::apiResource('symptoms', SymptomController::class)->except(['index']);
         Route::apiResource('complaints', ComplaintController::class)->only(['index']);
+        Route::put('/queues/{id}', [QueueController::class, 'update']);
     });
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin-page-rules', [PageController::class, 'adminPageRules']);
-        Route::apiResource('users', UserController::class)->except(['show']);
+        Route::apiResource('users', UserController::class)->except(['show', 'index']);
         Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
     });
 
