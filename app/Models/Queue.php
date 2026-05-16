@@ -41,15 +41,29 @@ class Queue extends Model
 
             $queue->id = 'Q-'.str_pad($number, 5, '0', STR_PAD_LEFT);
 
-            $todayCount = self::whereDate('created_at', '=', now()->toDateString(), 'and')
-                ->count();
+            $todayCount = self::query()->whereDate('created_at', '=', now()->toDateString(), 'and')->count();
+
+            $dayOfMonth = (int) now()->format('j');
+
+            $dateLetter = self::convertToAlpha($dayOfMonth);
 
             $queue->queue_number =
-                'Q-'.
-                now()->format('Ymd').
+                $dateLetter.
                 '-'.
                 str_pad($todayCount + 1, 3, '0', STR_PAD_LEFT);
         });
+    }
+
+    private static function convertToAlpha(int $number)
+    {
+        $alphabet = '';
+        while ($number > 0) {
+            $modulo = ($number - 1) % 26;
+            $alphabet = chr(65 + $modulo).$alphabet;
+            $number = (int) (($number - $modulo) / 26);
+        }
+
+        return $alphabet;
     }
 
     public function mechanic()

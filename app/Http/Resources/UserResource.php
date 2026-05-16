@@ -22,6 +22,7 @@ class UserResource extends JsonResource
                 'created_at' => $item->created_at,
                 'queue' => [
                     'status' => $item->queue->status,
+                    'number' => $item->queue->queue_number,
                 ],
             ];
         });
