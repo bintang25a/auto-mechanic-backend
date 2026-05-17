@@ -15,7 +15,7 @@ class UserController extends Controller
     {
         $query = User::query();
 
-        $filters = $request->except('page');
+        $filters = $request->except(['page', 'per_page']);
 
         foreach ($filters as $column => $value) {
             if (! empty($value)) {
@@ -23,15 +23,26 @@ class UserController extends Controller
             }
         }
 
-        $users = $query->paginate(20);
+        if ($request->has('per_page')) {
+            $users = $query->paginate($request->per_page);
 
-        return response()->json([
+            $responseData = [
+                'total' => $users->total(),
+                'current_page' => $users->currentPage(),
+                'data' => $users->items(),
+            ];
+        } else {
+            $damages = $query->get();
+
+            $responseData = [
+                'data' => $damages,
+            ];
+        }
+
+        return response()->json(array_merge([
             'success' => true,
             'message' => 'Get all users',
-            'total' => $users->total(),
-            'current_page' => $users->currentPage(),
-            'data' => $users->items(),
-        ], 200);
+        ], $responseData), 200);
     }
 
     public function show(string $uid)

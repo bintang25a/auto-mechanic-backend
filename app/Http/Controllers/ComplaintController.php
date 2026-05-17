@@ -14,22 +14,51 @@ class ComplaintController extends Controller
 {
     public function index(Request $request)
     {
-        $complaints = Complaint::with([
-            'customer',
-            'queue',
-            'symptoms',
-        ])
-            ->when($request->query('customer_id'), function ($query, $customerId) {
-                return $query->where('customer_id', $customerId);
-            })
-            ->latest()
-            ->get();
+        $query = Complaint::with(['customer', 'queue', 'symptoms']);
 
-        return response()->json([
+        $allowedFilters = [
+            'complaint_number',
+            'customer_id',
+            'queue_id',
+            'vehicle',
+            'license_number',
+            'description',
+        ];
+
+        foreach ($allowedFilters as $column) {
+            if ($request->filled($column)) {
+                $value = $request->input($column);
+
+                if ($column === 'customer_id') {
+                    $query->where($column, $value);
+                } else {
+                    $query->where($column, 'LIKE', '%'.$value.'%');
+                }
+            }
+        }
+
+        $query->latest();
+
+        if ($request->has('per_page')) {
+            $paginatedData = $query->paginate($request->input('per_page'));
+
+            $responseData = [
+                'total' => $paginatedData->total(),
+                'current_page' => $paginatedData->currentPage(),
+                'data' => $paginatedData->items(),
+            ];
+        } else {
+            $complaints = $query->get();
+
+            $responseData = [
+                'data' => $complaints,
+            ];
+        }
+
+        return response()->json(array_merge([
             'success' => true,
-            'message' => 'Get complaints data',
-            'data' => $complaints,
-        ], 200);
+            'message' => 'Get complaints data successfully',
+        ], $responseData), 200);
     }
 
     public function show(string $id)

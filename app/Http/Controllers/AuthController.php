@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => implode(', ', $validator->errors()->all())
+                'message' => implode(', ', $validator->errors()->all()),
             ], 422);
         }
 
@@ -66,36 +67,38 @@ class AuthController extends Controller
         }
     }
 
-    public function verifyEmail (Request $request, string $id, string $hash) {
+    public function verifyEmail(Request $request, string $id, string $hash)
+    {
 
         $user = User::query()->find($id);
 
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             return response()->json([
-                'message' => 'Invalid verification link'
+                'message' => 'Invalid verification link',
             ], 403);
         }
 
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
 
         return response()->json([
-            'message' => 'Email verified successfully'
+            'message' => 'Email verified successfully',
         ]);
     }
 
-    public function resendVerifyEmail(Request $request) {
+    public function resendVerifyEmail(Request $request)
+    {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json([
-                'message' => 'Email verified'
+                'message' => 'Email verified',
             ]);
         }
 
         $request->user()->sendEmailVerificationNotification();
 
         return response()->json([
-            'message' => 'Verified link resend'
+            'message' => 'Verified link resend',
         ]);
     }
 
@@ -103,31 +106,31 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => implode(', ', $validator->errors()->all())
+                'message' => implode(', ', $validator->errors()->all()),
             ], 422);
         }
 
         $credentials = $request->only(['email', 'password']);
 
-        if (!$token = Auth::guard('api')->attempt($credentials)) {
+        if (! $token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Wrong email or password'
+                'message' => 'Wrong email or password',
             ], 401);
         }
 
-        if (!auth('api')->user()->hasVerifiedEmail()) {
+        if (! auth('api')->user()->hasVerifiedEmail()) {
             Auth::guard('api')->logout();
 
             return response()->json([
                 'success' => false,
-                'message' => 'Email not verified'
+                'message' => 'Email not verified',
             ], 403);
         }
 
@@ -140,18 +143,20 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout successfully'
+            'message' => 'Logout successfully',
         ]);
     }
 
     public function me()
     {
-        $user = auth('api')->user();
+        $userId = auth('api')->id();
+
+        $user = User::with('complaints.queue')->find($userId);
 
         return response()->json([
             'success' => true,
             'message' => 'Fetch self successfully',
-            'data' => $user
+            'data' => new UserResource($user),
         ]);
     }
 
@@ -163,9 +168,9 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login successfully',
             'data' => array_merge($user->toArray(), [
-                'type'    => 'Bearer',
-                'token'  => $token,
-                'expires' => config('jwt.ttl') * 60
+                'type' => 'Bearer',
+                'token' => $token,
+                'expires' => config('jwt.ttl') * 60,
             ]),
         ]);
     }

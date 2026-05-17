@@ -25,8 +25,6 @@ Route::post('/email/resend', [AuthController::class, 'resendVerifyEmail'])->midd
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register']);
 
-// Queue Routes
-
 // Basic Routes
 Route::middleware('auth:api')->group(function () {
     // Auth Routes
@@ -36,7 +34,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/queues/current', [QueueController::class, 'current']);
 
     // Routes
-    Route::apiResource('users', UserController::class)->only(['show']);
     Route::apiResource('damages', DamageController::class)->only(['index']);
     Route::apiResource('symptoms', SymptomController::class)->only(['index']);
     Route::apiResource('rules', RuleController::class)->only(['index']);
@@ -44,7 +41,7 @@ Route::middleware('auth:api')->group(function () {
 
     // Admin and Staff Routes
     Route::middleware('role:admin,staff')->group(function () {
-        Route::apiResource('users', UserController::class)->only(['index',]);
+        Route::apiResource('users', UserController::class)->only(['show', 'index']);
         Route::apiResource('damages', DamageController::class)->except(['index']);
         Route::apiResource('symptoms', SymptomController::class)->except(['index']);
         Route::apiResource('complaints', ComplaintController::class)->only(['index']);
@@ -53,9 +50,9 @@ Route::middleware('auth:api')->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
-        Route::get('/admin-page-rules', [PageController::class, 'adminPageRules']);
-        Route::apiResource('users', UserController::class)->except(['show', 'index']);
         Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
+        Route::apiResource('users', UserController::class)->except(['show', 'index']);
+        Route::get('/admin-page-rules', [PageController::class, 'adminPageRules']);
     });
 
     // Staff Routes
