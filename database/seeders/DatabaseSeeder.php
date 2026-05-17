@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Complaint;
+use App\Models\Symptom;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,5 +31,23 @@ class DatabaseSeeder extends Seeder
             DamageSeeder::class,
             RuleSeeder::class,
         ]);
+
+        $symptomCodes = Symptom::query()->pluck('symptom_code')->toArray();
+
+        if (empty($symptomCodes)) {
+            $this->command->warn('Data Master Symptoms kosong! Jalankan seeder Symptoms terlebih dahulu.');
+
+            return;
+        }
+
+        Complaint::factory()
+            ->count(10)
+            ->create()
+            ->each(function ($complaint) use ($symptomCodes) {
+                $randomSymptoms = collect($symptomCodes)->random(rand(1, 3))->toArray();
+                $complaint->symptoms()->attach($randomSymptoms);
+            });
+
+        $this->command->info('Factory Complaint & Queue berhasil dijalankan!');
     }
 }
