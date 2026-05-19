@@ -11,26 +11,26 @@ class QueueController extends Controller
     {
         $queues = Queue::query()
             ->with('complaint')
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->number, fn($q) => $q->where('queue_number', $request->number))
+            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($request->number, fn ($q) => $q->where('queue_number', $request->number))
             ->orderBy('created_at', 'asc')
             ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Get all queue,' . $request->status,
+            'message' => 'Get all queue,'.$request->status,
             'data' => $queues,
         ]);
     }
 
     public function current()
     {
-        $current = Queue::query()->where('status', 'process')
+        $current = Queue::query()->with(['complaint', 'mechanic'])->where('status', 'process')
             ->orderBy('updated_at', 'desc')
             ->first();
 
         if (! $current) {
-            $current = Queue::query()->where('status', 'waiting')
+            $current = Queue::query()->with(['complaint', 'mechanic'])->where('status', 'waiting')
                 ->orderBy('created_at', 'asc')
                 ->first();
         }
