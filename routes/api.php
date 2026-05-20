@@ -34,6 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/queues/current', [QueueController::class, 'current']);
 
     // Routes
+    Route::apiResource('users', UserController::class)->only(['update']);
     Route::apiResource('damages', DamageController::class)->only(['index']);
     Route::apiResource('symptoms', SymptomController::class)->only(['index']);
     Route::apiResource('rules', RuleController::class)->only(['index']);
@@ -51,7 +52,7 @@ Route::middleware('auth:api')->group(function () {
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('rules', RuleController::class)->only(['store', 'destroy']);
-        Route::apiResource('users', UserController::class)->except(['show', 'index']);
+        Route::apiResource('users', UserController::class)->except(['show', 'index', 'update']);
         Route::get('/admin-page-rules', [PageController::class, 'adminPageRules']);
     });
 

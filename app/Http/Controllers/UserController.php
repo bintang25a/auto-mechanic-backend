@@ -70,7 +70,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone_number' => 'required|numeric',
-            'role' => 'required|in:admin,staff,customer',
+            'role' => 'required|in:admin,staff,customer,mechanic',
             'password' => 'required|string|min:8',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -135,7 +135,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->uid.',uid',
             'phone_number' => 'required|numeric',
-            'role' => 'required|in:admin,staff,customer',
+            'role' => 'required|in:admin,staff,customer,mechanic',
             'password' => 'string|min:8',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);

@@ -92,8 +92,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmailContrac
         );
     }
 
-    // public function handledComplaints()
-    // {
-    //     return $this->hasMany(Queue::class, 'mechanic_id', 'uid');
-    // }
+    public function handledComplaints()
+    {
+        return $this->hasMany(Queue::class, 'mechanic_id', 'uid');
+    }
 }

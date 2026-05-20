@@ -151,7 +151,7 @@ class AuthController extends Controller
     {
         $userId = auth('api')->id();
 
-        $user = User::with('complaints.queue')->find($userId);
+        $user = User::with(['complaints.queue', 'handledComplaints'])->find($userId);
 
         return response()->json([
             'success' => true,
