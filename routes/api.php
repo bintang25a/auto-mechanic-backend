@@ -25,6 +25,9 @@ Route::post('/email/resend', [AuthController::class, 'resendVerifyEmail'])->midd
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register']);
 
+// Landing Page Routes
+Route::get('/landing-page-data', [PageController::class, 'landingPageData']);
+
 // Basic Routes
 Route::middleware('auth:api')->group(function () {
     // Auth Routes
