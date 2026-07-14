@@ -20,7 +20,7 @@ class QueueFactory extends Factory
         $queueNumber = 'B-'.str_pad($this->faker->unique()->numberBetween(1, 100), 3, '0', STR_PAD_LEFT);
 
         return [
-            'id' => 'Q-'.$this->faker->unique()->numberBetween(100, 999),
+            'id' => 'Q-00'.$this->faker->unique()->numberBetween(100, 999),
             'queue_number' => $queueNumber,
             'status' => 'waiting',
             'mechanic_id' => null,
